@@ -17,32 +17,84 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+ 
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
-        let statusImage = UIImage(contentsOfFile: "/Users/wanglei/Desktop/status")
+        self.startProcess()
         
+        let alertController = UIAlertController(title: "提示", message: "你确定要离开？", preferredStyle:.alert)
         
+        // 设置2个UIAlertAction
+        //        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+        let okAction = UIAlertAction(title: "好的", style: .default) { (UIAlertAction) in
+            print("点击了好的")
+        }
+        
+        // 添加
+        //        alertController.addAction(cancelAction)
+        alertController.addAction(okAction)
+        
+        // 弹出
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    private func startProcess()
+    {
+        let statusImage_ios = UIImage(named: "status-ios");
+        var statusImage_Android = UIImage(named: "status-android");
+        let statusImage_nav = UIImage(named: "status-android-nav");
         let paths = getAllFilePath(dirPath: "/Users/wanglei/Desktop/img")
         for path in paths
         {
             imagePath = path
             if var savedImage = UIImage(contentsOfFile: path)
             {
-                //目前模拟器截出的手机宽为1242
-                if savedImage.size.width != 1242
+                if path.contains("iOS")
                 {
-                    savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusImage!, statusBarHeight: 25)
-                    compressImage(currentImage: savedImage, newSize: CGSize(width: 2048, height: 2732), imageName: "")
-
-                }else
-                {
-                    savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusImage!, statusBarHeight: 50)
-                    compressImage(currentImage: savedImage, newSize: CGSize(width: 1242, height: 2208), imageName: "")
+                    //目前模拟器截出的手机宽为1242
+                    if savedImage.size.width != 621 && savedImage.size.width != 1242
+                    {
+                        savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusImage_ios!, statusBarHeight: 25)
+                        compressImage(currentImage: savedImage, newSize: CGSize(width: 2048, height: 2732), imageName: "")
+                        
+                    }else
+                    {
+                        savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusImage_ios!, statusBarHeight: 50)
+                        compressImage(currentImage: savedImage, newSize: CGSize(width: 1242, height: 2208), imageName: "")
+                    }
                 }
+                if path.contains("Android")
+                {
+                    //如果文件名字带!!!, 则使用更黑的图片涂抹
+                    var statusimage = statusImage_Android
+                    
+                    if path.contains("!")
+                    {
+                        statusimage = statusImage_nav
+                    }
+                    
+                    //目前模拟器截出的手机宽为1242
+                    if savedImage.size.width == 1440
+                    {
+                        savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusimage!, statusBarHeight: 90)
+                        compressImage(currentImage: savedImage, newSize: CGSize(width: 1440, height: 2560), imageName: "")
+                        
+                    }else if savedImage.size.width == 1200
+                    {
+                        savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusimage!, statusBarHeight: 50)
+                        compressImage(currentImage: savedImage, newSize: CGSize(width: 1200, height: 1920), imageName: "")
+                    }else if savedImage.size.width == 1600
+                    {
+                        savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusimage!, statusBarHeight: 50)
+                        compressImage(currentImage: savedImage, newSize: CGSize(width: 1600, height: 2560), imageName: "")
+                    }
+                }
+                
             }
         }
-        print("done")
-        
-        
     }
     
     private func getAllFilePath(dirPath: String) -> [String]
