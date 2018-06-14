@@ -13,11 +13,17 @@ import UIKit
 class ViewController: UIViewController {
 
     var imagePath: String = "";
+    var logView: UITextView?;
+    var log: String = ""
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
- 
+        self.logView = UITextView(frame: self.view.bounds)
+//        self.logView?.backgroundColor = UIColor.gray
+        self.view.addSubview(self.logView!)
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -25,20 +31,8 @@ class ViewController: UIViewController {
         
         self.startProcess()
         
-        let alertController = UIAlertController(title: "提示", message: "你确定要离开？", preferredStyle:.alert)
-        
-        // 设置2个UIAlertAction
-        //        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
-        let okAction = UIAlertAction(title: "好的", style: .default) { (UIAlertAction) in
-            print("点击了好的")
-        }
-        
-        // 添加
-        //        alertController.addAction(cancelAction)
-        alertController.addAction(okAction)
-        
-        // 弹出
-        self.present(alertController, animated: true, completion: nil)
+        self.addLogToTheView(imagePath: "done!!!\ndone!!!\ndone!!!")
+    
     }
     
     private func startProcess()
@@ -55,15 +49,19 @@ class ViewController: UIViewController {
                 if path.contains("iOS")
                 {
                     //目前模拟器截出的手机宽为1242
-                    if savedImage.size.width != 621 && savedImage.size.width != 1242
+//                    if savedImage.size.width != 621 && savedImage.size.width != 1242
+                    if path.contains("iPad")
                     {
                         savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusImage_ios!, statusBarHeight: 25)
                         compressImage(currentImage: savedImage, newSize: CGSize(width: 2048, height: 2732), imageName: "")
                         
-                    }else
+                        self.addLogToTheView(imagePath: path)
+                        
+                    }else if path.contains("iPhone")
                     {
                         savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusImage_ios!, statusBarHeight: 50)
                         compressImage(currentImage: savedImage, newSize: CGSize(width: 1242, height: 2208), imageName: "")
+                        self.addLogToTheView(imagePath: path)
                     }
                 }
                 if path.contains("Android")
@@ -77,19 +75,27 @@ class ViewController: UIViewController {
                     }
                     
                     //目前模拟器截出的手机宽为1242
-                    if savedImage.size.width == 1440
+                    //if savedImage.size.width == 1440
+                    if path.contains("5.5inch")
                     {
-                        savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusimage!, statusBarHeight: 90)
+                        savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusimage!, statusBarHeight: 100)
                         compressImage(currentImage: savedImage, newSize: CGSize(width: 1440, height: 2560), imageName: "")
+                        self.addLogToTheView(imagePath: path)
                         
-                    }else if savedImage.size.width == 1200
+                    }
+//                    else if savedImage.size.width == 1200
+                    else if path.contains("7inch")
                     {
                         savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusimage!, statusBarHeight: 50)
                         compressImage(currentImage: savedImage, newSize: CGSize(width: 1200, height: 1920), imageName: "")
-                    }else if savedImage.size.width == 1600
+                        self.addLogToTheView(imagePath: path)
+                    }
+//                    else if savedImage.size.width == 1600
+                    else if path.contains("10inch")
                     {
                         savedImage = captureImageWithoutStatusBar(currentImage: savedImage, statusBarImage: statusimage!, statusBarHeight: 50)
                         compressImage(currentImage: savedImage, newSize: CGSize(width: 1600, height: 2560), imageName: "")
+                        self.addLogToTheView(imagePath: path)
                     }
                 }
                 
@@ -122,11 +128,6 @@ class ViewController: UIViewController {
                         filePaths.append(fullPath)
                     }
                 }
-//                if FileManager.default.fileExists(atPath: fullPath )
-//                {
-//                    filePaths.append(fullPath)
-//                }
-                
                 
             }
     
@@ -145,24 +146,6 @@ class ViewController: UIViewController {
         UIGraphicsEndImageContext()
         return finalImage!
         
-        
-//        let screenScale = UIScreen.main.scale
-//        let sourceImageRef: CGImage = currentImage.cgImage!
-//        let index = newView!.superview!.subviews.index(of: newView!)!
-//        let subImageFrame = CGRect.init(x: 0, y: 25, width: sourceImageRef.width, height: sourceImageRef.height)
-//
-//        ///核心代码就一句
-//        let subImage = UIImage.init(cgImage:sourceImageRef.cropping(to: subImageFrame)!)
-//
-//
-//        return subImage
-
-        
-        
-//        let sourceImageRef: CGImage = currentImage.cgImage!
-//        let newImage: CGImage = sourceImageRef.cropping(to: CGRect(x: 0, y: 0, width: sourceImageRef.width, height: sourceImageRef.height))!
-//        return UIImage.init(cgImage: newImage)
-        
     }
     
     private func compressImage(currentImage: UIImage, newSize: CGSize, imageName: String)
@@ -176,12 +159,24 @@ class ViewController: UIViewController {
             }
         }
     }
+    
+    private func addLogToTheView(imagePath: String)
+    {
+        RunLoop.current.run(until: NSDate.distantPast)
+        let log_temp = "\nfinish done with image for path " + imagePath
+        self.log.append(log_temp)
+        self.logView?.text = self.log
+
+        self.logView?.layoutManager.allowsNonContiguousLayout = false
+    self.logView?.scrollRangeToVisible(NSMakeRange((self.logView?.text.lengthOfBytes(using: .utf8))!, 10))
+        
+        print(log_temp)
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
 
 }
 
